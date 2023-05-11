@@ -6,6 +6,10 @@
 - Replication (replicas) improve fault-tolerance and achieves eventual consistency. 
 - Leader Election (Raft) makes more a distributed and reliable system. 
 
+## System Structure 
+<img width="479" alt="Screenshot 2023-05-11 at 2 32 07 PM" src="https://github.com/yao12138zy/distributed-kv-storage/assets/59595844/16ef78a3-3e6b-41fc-b9c1-d86b6fe3be55">
+
+
 ## Commands for Demo
 ### Build the project
 
