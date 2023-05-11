@@ -1,0 +1,118 @@
+package app_kvServer;
+
+import app_kvServer.storage.IKVStorage;
+import shared.Hash.IHashRing;
+import shared.ServerStatus;
+import shared.messages.IKVMessage;
+
+public interface IKVServer {
+    public enum CacheStrategy {
+        None,
+        LRU,
+        LFU,
+        FIFO
+    };
+
+    /**
+     * Get the port number of the server
+     * @return  port number
+     */
+    public int getPort();
+
+    /**
+     * Get the hostname of the server
+     * @return  hostname of server
+     */
+    public String getHostname();
+
+    /**
+     * Get the cache strategy of the server
+     * @return  cache strategy
+     */
+    public CacheStrategy getCacheStrategy();
+
+    /**
+     * Get the cache size
+     * @return  cache size
+     */
+    public int getCacheSize();
+
+    /**
+     * Check if key is in storage.
+     * NOTE: does not modify any other properties
+     * @return  true if key in storage, false otherwise
+     */
+    public boolean inStorage(String key);
+
+    /**
+     * Check if key is in storage.
+     * NOTE: does not modify any other properties
+     * @return  true if key in storage, false otherwise
+     */
+    public boolean inCache(String key);
+
+    /**
+     * Get the value associated with the key
+     * @return  value associated with key
+     * @throws Exception
+     *      when key not in the key range of the server
+     */
+    public String getKV(String key) throws Exception;
+
+    /**
+     * Put the key-value pair into storage
+     * @throws Exception
+     *      return code:
+     *      1 -> put successfully; -1 put failed
+     *      2 -> update successfully; -2 update failed
+     *      3 -> delete success; -3 delete failed
+     *      0 -> unexpected occurs
+     */
+    public IKVStorage.PutOperationResult putKV(String key, String value) throws Exception;
+
+    /**
+     * Clear the local cache of the server
+     */
+    public void clearCache();
+
+    /**
+     * Clear the storage of the server
+     */
+    public void clearStorage();
+
+    /**
+     * Starts running the server
+     */
+    public void start();
+
+    /**
+     * Abruptly stop the server without any additional actions
+     * NOTE: this includes performing saving to storage
+     */
+    public void kill();
+
+    /**
+     * Gracefully stop the server, can perform any additional actions
+     */
+    public void close();
+
+    public String getHashRingIdentity();
+
+    public boolean isServerLocked();
+
+    void unlockServer();
+
+    public void keyTransfer(String oldMeta, String newMeta);
+
+    IHashRing getMetadata();
+
+    void raftReceivedAppendEntries(IKVMessage message);
+    void receivedVoteReply(IKVMessage message);
+    void raftReceivedRequestVote(IKVMessage message);
+    void notifyEcsDisconnected();
+    void notifyElectedAsLeader();
+    void shuttingDown();
+    void notifyEcsFound(String ecsConnectionString);
+    String getCurrentEcsConnectionString();
+    //void raftReceivedAppendEntriesReply(IKVMessage message);
+}
